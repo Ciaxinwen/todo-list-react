@@ -12,13 +12,6 @@ export const todoSlice = createSlice({
     addTodoGroup: (state, action: PayloadAction<TodoGroup>) => {
       state.todoList.push(action.payload);
     },
-    addTodo: (state, action: PayloadAction<Todo>) => {
-      const { id } = action.payload;
-      const group = state.todoList.find((item) => item.id === id);
-      if (group) {
-        group.children.push(action.payload);
-      }
-    },
     setCurrentGroupId: (state, action: PayloadAction<string>) => {
       state.currentGroupId = action.payload;
     },
@@ -33,6 +26,52 @@ export const todoSlice = createSlice({
       const id = action.payload;
       state.todoList = state.todoList.filter((item) => item.id !== id);
     },
+
+    addTodo: (state, action: PayloadAction<Todo>) => {
+      const group = state.todoList.find(
+        (item) => item.id === state.currentGroupId
+      );
+      if (group) {
+        group.children.push(action.payload);
+      }
+    },
+    updateTodo: (state, action: PayloadAction<Todo>) => {
+      const todo = state.todoList.find(
+        (item) => item.id === state.currentGroupId
+      );
+      if (todo) {
+        const todoItemIndex = todo.children.findIndex(
+          (item) => item.id === action.payload.id
+        );
+        if (todoItemIndex !== -1) {
+          todo.children[todoItemIndex] = action.payload;
+        }
+      }
+    },
+    setTodoStatus: (
+      state,
+      action: PayloadAction<{ id: string; completed: boolean }>
+    ) => {
+      const { id, completed } = action.payload;
+      const todo = state.todoList.find(
+        (item) => item.id === state.currentGroupId
+      );
+      if (todo) {
+        const todoItem = todo.children.find((item) => item.id === id);
+        if (todoItem) {
+          todoItem.completed = completed;
+        }
+      }
+    },
+    deleteTodo: (state, action: PayloadAction<string>) => {
+      const id = action.payload;
+      const todo = state.todoList.find(
+        (item) => item.id === state.currentGroupId
+      );
+      if (todo) {
+        todo.children = todo.children.filter((item) => item.id !== id);
+      }
+    },
   },
 });
 
@@ -42,6 +81,9 @@ export const {
   setCurrentGroupId,
   updateTodoGroup,
   deleteTodoGroup,
+  setTodoStatus,
+  deleteTodo,
+  updateTodo,
 } = todoSlice.actions;
 
 export default todoSlice.reducer;

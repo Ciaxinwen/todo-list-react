@@ -5,7 +5,7 @@ export type Todo = {
   title: string;
   completed: boolean;
   content: string;
-  createTime: Date;
+  createTime: string;
 };
 
 export type TodoGroup = {
